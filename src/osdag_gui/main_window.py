@@ -29,7 +29,7 @@ from osdag_gui.data.database.database_config import get_module_function
 from osdag_core.Common import *
 # ---- Modues Imports ----
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-from plugins.purlin.flexure_purlin import Flexure_Purlin
+from plugins.purlin.purlin.flexure_purlin import Flexure_Purlin
 import openpyxl
 
 class MainWindow(QMainWindow):
@@ -504,8 +504,10 @@ class MainWindow(QMainWindow):
     def handle_card_open_clicked(self, card_title):
         if card_title == "Fin Plate":
             self.open_fin_plate_page()
-        if card_title == "Purlin Designer":
-            self.open_purlin_designer_page()
+        # if card_title == "Purlin Designer":
+        #     self.open_purlin_designer_page()
+        else:
+            self.open_plugin(card_title)
 
     #-------------Functions-to-load-modules-in-Tabwidget-START---------------------------
 
@@ -574,6 +576,17 @@ class MainWindow(QMainWindow):
         self.tab_widget_content[index][1] = True
         current_tab_data = self.tab_widget_content[index]
         self.update_docking_icons(current_tab_data[1], current_tab_data[2], current_tab_data[3], current_tab_data[4])
+
+    def open_plugin(self, plugin_name):
+        self.plugin_manager = QApplication.instance().plugin_manager
+        plugin = self.plugin_manager.get_plugin_by_name(plugin_name)
+        if plugin:
+            self.clear_layout(self.main_widget_layout)
+            plugin_instance = plugin.entry_class(parent=self)
+            self.main_widget_instance = plugin_instance
+            self.main_widget_layout.addWidget(plugin_instance)
+        else:
+            print(f"[WARN] Plugin '{plugin_name}' not found.")
 
     def open_home_page(self, module):
         self.clear_layout(self.main_widget_layout)
