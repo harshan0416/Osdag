@@ -2072,10 +2072,11 @@ class CommonDesignLogic(object):
     def display_3DModel(self, component, bgcolor):
 
         # Component colors
-        weld_color = Quantity_Color(255/255.0, 0/255.0, 0/255.0, Quantity_TOC_RGB)
+        weld_color = Quantity_NOC_SADDLEBROWN
         plate_color = Quantity_Color(47/255.0, 47/255.0, 35/255.0, Quantity_TOC_RGB)
         column_color = Quantity_Color(72/255.0, 72/255.0, 54/255.0, Quantity_TOC_RGB)
         beam_color = Quantity_Color(134/255.0, 134/255.0, 100/255.0, Quantity_TOC_RGB)
+        bolt_color = Quantity_Color(255/255.0, 0/255.0, 0/255.0, Quantity_TOC_RGB)
 
         self.component = component
 
@@ -2122,7 +2123,7 @@ class CommonDesignLogic(object):
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
                     label = ["Bolt", hover_dict["Bolt"]]
-                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "SeatAngle":
                 label = ["Angle", hover_dict["Angle"]]
@@ -2131,7 +2132,7 @@ class CommonDesignLogic(object):
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
                     label = ["Bolt", hover_dict["Bolt"]]
-                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "Plate":
                 # hover label
@@ -2143,7 +2144,7 @@ class CommonDesignLogic(object):
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
                     label = ["Bolt", hover_dict["Bolt"]]
-                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
             elif self.component == "Model":
                 # hover label
@@ -2170,7 +2171,7 @@ class CommonDesignLogic(object):
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
                 for nutbolt in nutboltlist:
                     label = ["Bolt", hover_dict["Bolt"]]
-                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True, label=label, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
         if self.mainmodule == "Moment Connection":
             if self.connection == KEY_DISP_BEAMCOVERPLATE:
@@ -2221,7 +2222,7 @@ class CommonDesignLogic(object):
                                         color='Blue')
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
-                                        color=Quantity_NOC_SADDLEBROWN)
+                                        color=bolt_color)
 
                 elif self.component == "Model":
 
@@ -2231,7 +2232,7 @@ class CommonDesignLogic(object):
                                         color='Blue')
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True, color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
-                                        color=Quantity_NOC_SADDLEBROWN)
+                                        color=bolt_color)
 
 
 
@@ -2315,7 +2316,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
                         color=weld_color, label=label_weld, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
-                        color=Quantity_NOC_SADDLEBROWN, label=label_bolt, canvas=self.cad_widget)
+                        color=bolt_color, label=label_bolt, canvas=self.cad_widget)
 
 
                 elif self.component == "Model":
@@ -2328,7 +2329,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, self.ExtObj.get_welded_models(), update=True,
                         color=weld_color, label=label_weld, canvas=self.cad_widget)
                     osdag_display_shape(self.display, self.ExtObj.get_nut_bolt_array_models(), update=True,
-                        color=Quantity_NOC_SADDLEBROWN, label=label_bolt, canvas=self.cad_widget)
+                        color=bolt_color, label=label_bolt, canvas=self.cad_widget)
                     # Point1 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -self.Bc.supporting_section.depth/2, c_length*0.75)
                     # DisplayMsg(self.display, Point1, self.Bc.supporting_section.designation)
                     # Point2 = gp_Pnt(self.Bc.supporting_section.flange_width/2, -b_length, c_length / 2)
@@ -2420,10 +2421,10 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.plate2_model, update=True)
                 for bolt in self.bolt_models:
                     osdag_display_shape(self.display, bolt, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)
+                                            color=bolt_color)
                 for nut in self.nuts_models:
                     osdag_display_shape(self.display, nut, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)
+                                            color=bolt_color)
                     
         elif self.mainmodule == 'Butt Joint Bolted Connection':
             self.col = self.module_object  
@@ -2435,10 +2436,10 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.platec_model, update=True)
                 for bolt in self.bolt_models:
                     osdag_display_shape(self.display, bolt, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)
+                                            color=bolt_color)
                 for nut in self.nuts_models:
                     osdag_display_shape(self.display, nut, update=True,
-                                            color=Quantity_NOC_SADDLEBROWN)                     
+                                            color=bolt_color)                     
 
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_object  
