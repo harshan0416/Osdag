@@ -33,6 +33,8 @@ class CustomWindow(QWidget):
     downloadDatabase = Signal(str, str)
     def __init__(self, title: str, backend: object, parent):
         super().__init__()
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         self.backend = backend()
 
@@ -1824,6 +1826,8 @@ class CustomWindow(QWidget):
 class InputDockIndicator(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         self.setObjectName("input_dock_indicator")
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Fixed width, expanding height
@@ -1865,6 +1869,8 @@ class InputDockIndicator(QWidget):
 class OutputDockIndicator(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         self.setObjectName("output_dock_indicator")
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Fixed width, expanding height
@@ -1906,6 +1912,8 @@ class OutputDockIndicator(QWidget):
 class CadComponentCheckbox(QWidget):
     def __init__(self, backend:object, parent):
         super().__init__(parent)
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
         # Fetch checkbox data
         data = backend.get_3d_components()
