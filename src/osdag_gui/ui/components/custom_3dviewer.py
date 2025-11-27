@@ -20,6 +20,7 @@ class CustomViewer3d(qtViewer3d):
         self.model_ais_objects = {}  # Dictionary to map AIS objects to model names
         self.model_hover_labels = {}  # Dictionary to map model names to tooltip text
         self.current_hovered_model = None
+        self.current_highlighted_ais = None  # Track currently highlighted object
         self.hover_timer = QTimer(self)
         self.hover_timer.setSingleShot(True)
         self.hover_timer.timeout.connect(self.show_tooltip)
@@ -46,6 +47,16 @@ class CustomViewer3d(qtViewer3d):
             hovered_model = None
             if self.context.HasDetected():
                 detected = self.context.DetectedInteractive()
+
+                # Handle Highlighting
+                if detected != self.current_highlighted_ais:
+                    if self.current_highlighted_ais:
+                        self.context.Unhilight(self.current_highlighted_ais, False)
+                    
+                    self.current_highlighted_ais = detected
+                    self.context.HilightWithColor(self.current_highlighted_ais, self.context.HighlightStyle(), False)
+                    self.view.Redraw()
+
                 for model_name, ais_list in self.model_ais_objects.items():
                     for ais_object in ais_list:
                         try:
@@ -58,6 +69,12 @@ class CustomViewer3d(qtViewer3d):
                                 break
                         except:
                             continue
+            else:
+                # Unhighlight if nothing detected
+                if self.current_highlighted_ais:
+                    self.context.Unhilight(self.current_highlighted_ais, False)
+                    self.current_highlighted_ais = None
+                    self.view.Redraw()
 
             self.hover_position = event.globalPosition().toPoint()
             if hovered_model != self.current_hovered_model:
@@ -84,5 +101,13 @@ class CustomViewer3d(qtViewer3d):
     def leaveEvent(self, event):
         self.hover_timer.stop()
         self.current_hovered_model = None
+        # Also unhighlight when leaving
+        if self.current_highlighted_ais:
+            try:
+                self.context.Unhilight(self.current_highlighted_ais, False)
+                self.current_highlighted_ais = None
+                self.view.Redraw()
+            except:
+                pass
         QToolTip.hideText()
         super().leaveEvent(event)
