@@ -1896,12 +1896,23 @@ class CommonDesignLogic(object):
         B_fb = float(getattr(Conn, 'bottom_flange_width', 400))
         
         # Stiffener parameters
-        stiffener_spacing = float(getattr(Conn, 'c', 750)) if hasattr(Conn, 'c') and Conn.c not in ['NA', None, ''] else 750
-        T_is = float(getattr(Conn, 'IntStiffThickness', 15)) if hasattr(Conn, 'IntStiffThickness') else 15
+        # Stiffener parameters
+        stiffener_spacing_val = getattr(Conn, 'c', 'NA')
+        include_intermediate_stiffeners = True
+        stiffener_spacing = 750.0
+
+        if str(stiffener_spacing_val).strip() in ['NA', 'None', '', 'nan']:
+            include_intermediate_stiffeners = False
+        else:
+            try:
+                stiffener_spacing = float(stiffener_spacing_val)
+                if stiffener_spacing <= 0:
+                     include_intermediate_stiffeners = False
+            except:
+                include_intermediate_stiffeners = False
+                stiffener_spacing = 750.0
         
-        # Handle NA values for spacing
-        if isinstance(stiffener_spacing, str):
-            stiffener_spacing = 750
+        T_is = float(getattr(Conn, 'IntStiffThickness', 15)) if hasattr(Conn, 'IntStiffThickness') else 15
         
         print(f"DEBUG: Plate Girder Parameters:")
         print(f"  D={D}, tw={tw}, length={length}")
@@ -1926,13 +1937,21 @@ class CommonDesignLogic(object):
                      T_hp = float(thk_val)
                 
                 # Get position/offset
-                pos_val = getattr(Conn, 'x1', 0)
-                if pos_val is not None and str(pos_val).strip() != '':
-                    # x1 is distance from compression flange (top)
-                    horizontal_plate_offset_ratio = float(pos_val) / D
+                # If only 1 stiffener, place at 0.5 * D (center) as requested
+                if float(num_long_stiff) == 1:
+                    horizontal_plate_offset_ratio = 0.5
+                else:
+                    pos_val = getattr(Conn, 'x1', 0)
+                    if pos_val is not None and str(pos_val).strip() != '':
+                        # x1 is distance from compression flange (top)
+                        horizontal_plate_offset_ratio = float(pos_val) / D
         except Exception as e:
             print(f"Error extracting horizontal plate params: {e}")
             include_horizontal_plate = False
+
+        # End Stiffener Thickness
+        T_es = float(getattr(Conn, 'EndStiffThickness', 15)) if hasattr(Conn, 'EndStiffThickness') else 15
+        if T_es <= 0: T_es = 15 # validation
 
         # Create the plate girder model
         components = create_plate_girder(
@@ -1950,6 +1969,9 @@ class CommonDesignLogic(object):
             include_horizontal_plate=include_horizontal_plate,
             horizontal_plate_offset_ratio=horizontal_plate_offset_ratio,
             T_hp=T_hp,
+            include_intermediate_stiffeners=include_intermediate_stiffeners,
+            T_es=T_es,
+            end_stiffener_gap=50,
         )
         
         # Store components for display_3DModel
@@ -2198,7 +2220,7 @@ class CommonDesignLogic(object):
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
             R2 = float(Col.section_property.toe_radius)
-            spacing = float(Col.plate_thickness)   # Gap between angles
+            spacing = float(Col.platfe_thickness)   # Gap between angles
             print("Length (L):", L)
             print("Thickness (T):", T)
             print("Root Radius (R1):", R1)
