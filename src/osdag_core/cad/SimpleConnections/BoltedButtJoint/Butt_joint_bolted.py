@@ -146,6 +146,14 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     # --- Calculate Bolt Positions ---
     # In a butt joint, the SAME bolt pattern should be on BOTH sides of the joint line
     # Place bolts on Plate 1 side, then mirror them on Plate 2 side
+    # 
+    # AXIS ORIENTATION (as per user's coordinate system in the 3D view):
+    # - X-axis: Horizontal (across plate width) - ROWS should be along this axis
+    # - Y-axis: Along plate length (towards/away from joint) - COLUMNS should be along this axis
+    # - Z-axis: Vertical
+    #
+    # bolt_rows = number of bolts along X-axis (horizontal rows)
+    # bolt_cols = number of bolts along Y-axis (columns stacking towards/away from joint)
     bolt_positions = []
     
     # Joint line is at y = plate_length / 2 (center of cover plate)
@@ -155,17 +163,36 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     bolt_z_origin = reference_top_z + cover_thickness
     
     print(f"DEBUG BOLT: bolt_rows={bolt_rows}, bolt_cols={bolt_cols}, joint_line_y={joint_line_y}")
-    print(f"DEBUG BOLT: end={end}, pitch={pitch}")
+    print(f"DEBUG BOLT: end={end}, pitch={pitch}, gauge={gauge}, edge={edge}")
     
     # Calculate bolt positions for Plate 1 side (y < joint_line)
     # These bolts go from the joint towards Plate 1
     plate1_count = 0
+    
+    # Calculate X positions (across plate width) - this is for ROWS (horizontal)
+    # Rows should be distributed from edge to (plate_width - edge)
+    if bolt_rows <= 1:
+        # Single row: center it across the width
+        x_positions = [plate_width / 2.0]
+    else:
+        # Multiple rows: distribute from edge to (plate_width - edge)
+        # Spacing between rows (horizontal) = gauge
+        x_spacing = (plate_width - 2 * edge) / (bolt_rows - 1)
+        x_positions = [edge + row * x_spacing for row in range(bolt_rows)]
+    
+    print(f"DEBUG BOLT: plate_width={plate_width}, edge={edge}, x_positions={x_positions}")
+    print(f"DEBUG BOLT: bolt_rows={bolt_rows}, bolt_cols={bolt_cols}")
+    
+    # Plate 1 side: bolts go from joint_line towards Y=0
+    # Columns go along Y-axis (towards/away from joint)
     for col in range(bolt_cols):
         for row in range(bolt_rows):
-            # Place bolts on Plate 1 side - starting from joint line going towards Plate 1
+            # Col 0 is closest to joint line, subsequent cols move towards Plate 1
             bolt_y = joint_line_y - end - (col * pitch)
+            bolt_x = x_positions[row]
+            
             bolt_positions.append((
-                edge + (row * gauge),
+                bolt_x,
                 bolt_y,
                 bolt_z_origin
             ))
@@ -177,10 +204,12 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     plate2_count = 0
     for col in range(bolt_cols):
         for row in range(bolt_rows):
-            # Place bolts on Plate 2 side - mirror of Plate 1 positions
+            # Col 0 is closest to joint line, subsequent cols move towards Plate 2
             bolt_y = joint_line_y + end + (col * pitch)
+            bolt_x = x_positions[row]
+            
             bolt_positions.append((
-                edge + (row * gauge),
+                bolt_x,
                 bolt_y,
                 bolt_z_origin
             ))
